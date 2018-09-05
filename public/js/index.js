@@ -8,16 +8,18 @@ socket.on("connect",function(){
 socket.on("newMessage", function(message){
   console.log("New Message : ", message);
 
+  let formattedTime = moment(message.createdAt).format("h:mm a");
   let li = $("<li></li>");
-  li.text(`${message.from} : ${message.text}`);
+  li.text(`${message.from} ${formattedTime}: ${message.text}`);
   $("#messages").append(li);
 });
 
 socket.on("newLocationMessage",function(message){
+  let formattedTime = moment(message.createdAt).format("h:mm a");
   let li = $("<li></li>");
   let a = $("<a target='_blank'>My current location</a>");
   a.attr('href',message.url);
-  li.text(`${message.from} : `);
+  li.text(`${message.from} ${formattedTime}: `);
   li.append(a);
   $("#messages").append(li);
 });
