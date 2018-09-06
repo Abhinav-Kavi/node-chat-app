@@ -38,21 +38,29 @@ io.on("connection", (socket)=>{
   });
 
   socket.on("createMessage", (message,callback)=>{
-    console.log("Create Message : ", message);
-    io.emit("newMessage", generateMessage(message.from, message.text));
-    callback("Message was created successfully!");
+    let user = users.getUser(socket.id);
+
+    if(user && isRealString(message.text)){
+      io.to(user.room).emit("newMessage", generateMessage(user.name, message.text));
+      return callback();
+    }
+    callback("Error occured while creating message");
   });
 
   socket.on("createLocationMessage",(coords)=>{
-    io.emit("newLocationMessage", generateLocationMessage("Admin",coords.latitude ,coords.longitude));
+    let user = users.getUser(socket.id);
+    if(user)
+      io.to(user.room).emit("newLocationMessage", generateLocationMessage(user.name,coords.latitude ,coords.longitude));   
   });
 
   socket.on("disconnect", ()=>{
     console.log("User was disconnected");
     let user = users.removeUser(socket.id);
-
-    io.to(user.room).emit("updateUserList",users.getUserList(user.room));
-    socket.broadcast.to(user.room).emit("newMessage",generateMessage("Admin",`${user.name} has left!`));
+    
+    if(user){
+      io.to(user.room).emit("updateUserList",users.getUserList(user.room));
+      socket.broadcast.to(user.room).emit("newMessage",generateMessage("Admin",`${user.name} has left!`)); 
+    }   
   });
 });
 
