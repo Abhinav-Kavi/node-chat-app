@@ -1,7 +1,7 @@
 var socket = io();
 var messageTextbox = $('[name=message]');
 
-var scrollToBotttom = function(){
+function scrollToBotttom(){
   //Selectors
   var messages = $("#messages");
   var newMessage = messages.children("li:last-child");
@@ -20,6 +20,16 @@ var scrollToBotttom = function(){
 
 socket.on("connect",function(){
   console.log("Connected to server");
+  var params = $.deparam(window.location.search);
+  socket.emit("join",params,function(err){
+    if(err){
+      alert(err);
+      window.location.href = "/";
+    }
+     
+    else
+     console.log("No error");
+  });
 });
 
 socket.on("newMessage", function(message){
@@ -51,6 +61,14 @@ socket.on("newLocationMessage",function(message){
 socket.on("disconnect",function() {
   console.log("Disconnected from server");
 });
+
+socket.on("updateUserList", function(userList){
+  var ol = $("<ol></ol>");
+  console.log(userList);
+  userList.forEach(name => ol.append($("<li></li>").text(name)));
+
+  $("#users").html(ol);
+})
 
 $("#message-form").on("submit",function(e){
   e.preventDefault();
