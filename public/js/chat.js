@@ -21,6 +21,7 @@ function scrollToBotttom(){
 socket.on("connect",function(){
   console.log("Connected to server");
   var params = $.deparam(window.location.search);
+
   socket.emit("join",params,function(err){
     if(err){
       alert(err);
@@ -64,9 +65,7 @@ socket.on("disconnect",function() {
 
 socket.on("updateUserList", function(userList){
   var ol = $("<ol></ol>");
-  console.log(userList);
   userList.forEach(name => ol.append($("<li></li>").text(name)));
-
   $("#users").html(ol);
 })
 
